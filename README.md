@@ -1,4 +1,4 @@
-# ZipLine - Zycus Hackathon Solution 🚀
+# ZipRun - Zycus Hackathon Solution 🚀
 
 An intelligent, reactive automated order routing and agentic reassignment engine featuring dynamic, context-aware dispatching optimization via AI and rule-based pipelines.
 
