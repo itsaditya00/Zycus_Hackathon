@@ -1,0 +1,111 @@
+<div class="dashboard-container">
+  <header>
+    <h1>🚀 Hackathon Delivery Optimization Console</h1>
+  </header>
+
+  <div class="grid-layout">
+    <!-- Left Column: Controls & Configuration -->
+    <div class="control-panel">
+      
+      <!-- Create Order -->
+      <section class="card">
+        <h3>📦 Create New Order</h3>
+        <form (ngSubmit)="submitOrder()">
+          <input type="text" [(ngModel)]="newOrder.id" name="id" placeholder="Order ID (e.g., ORD-010)" required>
+          <input type="text" [(ngModel)]="newOrder.description" name="description" placeholder="Description" required>
+          <input type="text" [(ngModel)]="newOrder.assignedAgentId" name="agent" placeholder="Agent ID" required>
+          <button type="submit">Post Order</button>
+        </form>
+      </section>
+
+      <!-- Strategy Config -->
+      <section class="card">
+        <h3>⚙️ Global Strategy Configuration</h3>
+        <div class="flex-row">
+          <select [(ngModel)]="strategy">
+            <option value="RULE_BASED">RULE_BASED</option>
+            <option value="AI_DRIVEN">AI_DRIVEN</option>
+          </select>
+          <button (click)="changeStrategy()">Update Strategy</button>
+        </div>
+      </section>
+
+      <!-- Agent Management -->
+      <section class="card">
+        <h3>👤 Update Agent Status</h3>
+        <form (ngSubmit)="updateAgent()">
+          <input type="text" [(ngModel)]="agentUpdate.id" name="agentId" placeholder="Agent ID (e.g., AGT-001)" required>
+          <select [(ngModel)]="agentUpdate.status" name="agentStatus">
+            <option value="ONLINE">ONLINE</option>
+            <option value="OFFLINE">OFFLINE</option>
+          </select>
+          <button type="submit">Patch Status</button>
+        </form>
+      </section>
+
+      <!-- Patch Suggestion -->
+      <section class="card">
+        <h3>💡 Handle External Suggestion</h3>
+        <input type="text" [(ngModel)]="suggestionId" placeholder="Suggestion UUID">
+        <div class="flex-row gap">
+          <button class="btn-success" (click)="processSuggestion('ACCEPTED')">Accept</button>
+          <button class="btn-danger" (click)="processSuggestion('REJECTED')">Reject</button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Right Column: Live Board & Monitoring -->
+    <div class="display-panel">
+      
+      <!-- Assigned Orders Display -->
+      <section class="card data-card">
+        <div class="flex-row space-between">
+          <h3>📋 Assigned Orders (Live Status)</h3>
+          <button class="btn-refresh" (click)="fetchAssignedOrders()">🔄 Refresh</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Agent</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of assignedOrders; track order.id) {
+                <tr>
+                  <td><strong>{{ order.id }}</strong></td>
+                  <td>{{ order.description }}</td>
+                  <td><span class="badge agent">{{ order.assignedAgentId }}</span></td>
+                  <td><span class="badge status">{{ order.status }}</span></td>
+                  <td>
+                    <button class="btn-action" (click)="requestSuggestion(order.id)">💡 Suggest</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="empty-state">No assigned orders found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Console Logs -->
+      <section class="card log-card">
+        <h3>🪵 System Event Logs</h3>
+        <div class="logs-window">
+          @for (log of logs; track $index) {
+            <div class="log-entry">{{ log }}</div>
+          }
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
