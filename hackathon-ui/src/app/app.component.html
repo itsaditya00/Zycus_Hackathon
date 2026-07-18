@@ -1,0 +1,181 @@
+<div class="dashboard-container">
+  <header>
+    <h1>🚀 Hackathon Delivery Optimization Console</h1>
+  </header>
+
+  <!-- Real-Time AI Thinking Log Stream Window -->
+  @if (streamingOrderId) {
+    <div class="card" style="border-left: 4px solid #4f46e5; background: #fafafa;">
+      <h3 style="color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+        <span class="spinner">🧠</span> AI Engine Analyzing Order: <code>{{ streamingOrderId }}</code>
+      </h3>
+      <p style="font-family: monospace; background: #0f172a; color: #38bdf8; padding: 1rem; border-radius: 6px; white-space: pre-wrap;">{{ aiThinkingText || 'Establishing backend link streams...' }}</p>
+    </div>
+  }
+
+  <div class="grid-layout">
+    <!-- Left Column: Controls & Configuration -->
+    <div class="control-panel">
+      
+      <!-- Query / Criteria Filter Console -->
+      <section class="card">
+        <h3>🔍 Filter Orders Criteria</h3>
+        <input type="text" [(ngModel)]="filterId" placeholder="Search by Order ID (e.g., ORD-001)">
+        <input type="text" [(ngModel)]="filterAgentId" placeholder="Search by Agent ID (e.g., AGT-003)">
+        
+        <label style="font-size: 0.85rem; color: #64748b;">Order Status Target Filter:</label>
+        <select [(ngModel)]="filterStatus">
+          <option value="">-- View All Status Types --</option>
+          <option value="ASSIGNED">ASSIGNED</option>
+          <option value="REASSIGNMENT_PENDING">REASSIGNMENT_PENDING</option>
+          <option value="REASSIGNED">REASSIGNED</option>
+          <option value="DELIVERED">DELIVERED</option>
+        </select>
+        <button (click)="fetchFilteredOrders()" class="btn-success">Apply Grid Search</button>
+      </section>
+
+      <!-- Create Order -->
+      <section class="card">
+        <h3>📦 Create New Order</h3>
+        <form (ngSubmit)="submitOrder()">
+          <input type="text" [(ngModel)]="newOrder.id" name="id" placeholder="Order ID (e.g., ORD-010)" required>
+          <input type="text" [(ngModel)]="newOrder.description" name="description" placeholder="Description" required>
+          <input type="text" [(ngModel)]="newOrder.assignedAgentId" name="agent" placeholder="Agent ID" required>
+          <button type="submit">Post Order</button>
+        </form>
+      </section>
+
+      <!-- Strategy Config -->
+      <section class="card">
+        <h3>⚙️ Global Strategy Configuration</h3>
+        <div class="flex-row">
+          <select [(ngModel)]="globalStrategy">
+            <option value="AI_POWERED">AI_POWERED (Default)</option>
+            <option value="RULE_BASED">RULE_BASED</option>
+          </select>
+          <button (click)="changeStrategy()">Update Strategy</button>
+        </div>
+      </section>
+
+      <!-- Agent Management -->
+      <section class="card">
+        <h3>👤 Update Agent Status</h3>
+        <form (ngSubmit)="updateAgent()">
+          <input type="text" [(ngModel)]="agentUpdate.id" name="agentId" placeholder="Agent ID (e.g., AGT-001)" required>
+          <select [(ngModel)]="agentUpdate.status" name="agentStatus">
+            <option value="ONLINE">ONLINE</option>
+            <option value="OFFLINE">OFFLINE</option>
+          </select>
+          <button type="submit">Patch Status</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- Right Column: Live Board & Monitoring -->
+    <div class="display-panel">
+      
+      <!-- Routing Suggestions Board (Sorted High to Low Confidence) -->
+      <section class="card data-card" style="border-top: 4px solid #10b981;">
+        <h3>💡 System Routing Suggestions (Sorted by Confidence Score)</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Target Agent</th>
+                <th>Confidence</th>
+                <th>Reasoning Explanation</th>
+                <th>Action Selection</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (sug of suggestionsList; track sug.orderId) {
+                <tr>
+                  <td><strong>{{ sug.orderId }}</strong></td>
+                  <td><span class="badge agent">{{ sug.recommendedAgentId }}</span></td>
+                  <td>
+                    <strong style="color: #10b981;">{{ sug.confidenceScore * 100 | number:'1.0-1' }}%</strong>
+                  </td>
+                  <td style="font-size: 0.85rem; max-width: 250px;">{{ sug.reasoning }}</td>
+                  <td>
+                    <!-- Accept/Reject/Pending Select Dropdown Execution Trigger -->
+                    <select #decisionSelect (change)="executeDecision(sug.orderId, decisionSelect.value)" style="padding: 0.3rem; margin: 0; font-size: 0.85rem; width: auto;">
+                      <option value="" disabled selected>Select Action...</option>
+                      <option value="ACCEPTED">Accept</option>
+                      <option value="REJECTED">Reject</option>
+                      <option value="PENDING">Pending</option>
+                    </select>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="empty-state" style="text-align: center; color: #94a3b8; padding: 2rem;">
+                    No operational suggestions active. Click "Suggest Route" on an order below.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Assigned Orders Display -->
+      <section class="card data-card">
+        <div class="flex-row space-between">
+          <h3>📋 Assigned Orders (Live Status)</h3>
+          
+          <!-- Route Parameter Execution Selector Flag Override -->
+          <div class="flex-row" style="gap: 0.5rem; width: auto;">
+            <label style="font-size: 0.8rem; white-space: nowrap; color: #64748b;">Route Via:</label>
+            <select [(ngModel)]="executionStrategy" style="padding: 0.3rem; margin: 0; font-size: 0.85rem; width: auto;">
+              <option value="AI_POWERED">AI_POWERED</option>
+              <option value="RULE_BASED">RULE_BASED</option>
+            </select>
+            <button class="btn-refresh" (click)="fetchFilteredOrders()">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Agent</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of ordersList; track order.id) {
+                <tr>
+                  <td><strong>{{ order.id }}</strong></td>
+                  <td>{{ order.description }}</td>
+                  <td><span class="badge agent">{{ order.assignedAgentId || 'UNASSIGNED' }}</span></td>
+                  <td><span class="badge status">{{ order.status }}</span></td>
+                  <td>
+                    <button class="btn-action" (click)="getSuggestion(order.id)">💡 Suggest Route</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="empty-state" style="text-align: center; padding: 2rem; color: #94a3b8;">No matching active orders found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Console Logs -->
+      <section class="card log-card">
+        <h3>🪵 System Event Logs</h3>
+        <div class="logs-window">
+          @for (log of logs; track $index) {
+            <div class="log-entry">{{ log }}</div>
+          }
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
