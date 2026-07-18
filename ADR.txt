@@ -1,0 +1,30 @@
+# Architectural Decision Record (ADR)
+
+## Status
+Approved
+
+## Context & Decisions
+
+---
+
+## 1. Where Does Routing Logic Live?
+
+### Decision
+The routing logic is isolated within a dedicated **Strategy Pattern** infrastructure inside the `com.test.hackathon_backend.strategy` package, coordinated by a `RoutingEngineContext` acting as the structural boundary. It does not live inside the core Domain Models (`Agent`, `Order`) or get bloated inside standard CRUD components like `AgentService` or `OrderService`.
+
+### Boundary Enforced & Justification
+This approach enforces a strict separation between **Persistence/State Management** and **Execution Algorithms**. 
+* **Domain Model Boundary:** Domain models like `Order` and `Agent` remain pure state holders and state machines, free of external side-effects like HTTP client calls to an LLM or complex evaluation criteria.
+* **Service Layer Boundary:** If routing logic were allowed to live directly within a unified service class, that class would quietly grow to violate the Single Responsibility Principle by handling persistence, event publishing, rule evaluation, and external AI orchestration simultaneously—a severe architectural smell. By delegating routing to the `RoutingStrategy` implementations, we ensure the service layer merely orchestrates transactions and delegates evaluation to specialized algorithmic components.
+
+---
+
+## 2. How Does Runtime Strategy Switching Work?
+
+### Decision
+Runtime strategy switching is implemented via the **Strategy Design Pattern**. The application defines a structural interface `RoutingStrategy` with a unified execution contract:
+
+```java
+public interface RoutingStrategy {
+    ReassignmentSuggestion determineReassignment(Order order, List<Agent> availableAgents);
+}
