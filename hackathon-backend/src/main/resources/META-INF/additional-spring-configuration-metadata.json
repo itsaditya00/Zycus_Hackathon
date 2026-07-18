@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "llm.provider",
+    "type": "java.lang.String",
+    "description": "A description for 'llm.provider'"
+  },
+  {
+    "name": "llm.api-key",
+    "type": "java.lang.String",
+    "description": "A description for 'llm.api-key'"
+  },
+  {
+    "name": "llm.model",
+    "type": "java.lang.String",
+    "description": "A description for 'llm.model'"
+  },
+  {
+    "name": "llm.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'llm.base-url'"
+  }
+]}
