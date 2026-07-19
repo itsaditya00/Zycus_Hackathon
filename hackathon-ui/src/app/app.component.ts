@@ -13,6 +13,8 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./app.component.css'] // FIXED: Wrapped string inside an array
 })
 export class AppComponent implements OnInit, OnDestroy {
+  title = 'hackathon-ui';
+  
   // Filter Criteria States
   filterId = '';
   filterStatus = '';
@@ -37,8 +39,8 @@ export class AppComponent implements OnInit, OnDestroy {
   private streamSubscription?: Subscription;
 
   constructor(
-    @Inject('HackathonServiceToken') private hackathonService: HackathonService
-  ) {}
+  @Inject('HackathonServiceToken') private hackathonService: HackathonService
+) {}
 
   ngOnInit(): void {
     this.fetchFilteredOrders();

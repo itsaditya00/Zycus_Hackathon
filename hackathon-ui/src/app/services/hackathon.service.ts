@@ -23,6 +23,7 @@ export interface Suggestion {
 @Injectable({
   providedIn: 'root'
 })
+
 export class HackathonService {
   private baseUrl = 'http://localhost:8080';
 
