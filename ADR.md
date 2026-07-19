@@ -104,4 +104,4 @@ public class GeographicRoutingStrategy implements RoutingStrategy {
 
 ## 📺 Project Demo Video
 Click the link below to watch our live application demo:
-👉 **[Watch the Demo Video on Loom] https://www.loom.com/share/87f7628da8144124ae807a675b00ef47**
+👉 **[Watch the Demo Video on Loom] [https://www.loom.com/share/87f7628da8144124ae807a675b00ef47]**
